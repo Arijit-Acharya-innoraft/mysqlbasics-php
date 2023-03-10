@@ -1,0 +1,72 @@
+CREATE TABLE employee_code_table(  
+  employee_code VARCHAR(255) PRIMARY KEY ,
+  employee_code_name VARCHAR(255),
+  employee_domain VARCHAR(255)
+);
+
+CREATE TABLE employee_details_table(
+  employee_id VARCHAR(255) PRIMARY KEY,
+  employee_salary VARCHAR(255),
+  employee_code VARCHAR(255) ,
+  FOREIGN KEY (employee_code) REFERENCES employee_code_table (employee_code)
+);
+ALTER TABLE employee_details_table RENAME employee_salary_table;
+
+CREATE TABLE employee_details_table(
+  employee_id VARCHAR(255) PRIMARY KEY,
+  employee_first_name VARCHAR(255),
+  employee_last_name VARCHAR(255),
+  Graduation_percentile DECIMAL(5,2)
+);
+
+INSERT INTO employee_code_table
+VALUES
+("su_john","ru_john","Java"),
+("su_daenerys","du_daenerys","PHP"),
+("su_cersei","ru_cersei","Java"),
+("su_tyrion","tu_tyrion","Angular JS");
+
+INSERT INTO employee_salary_table
+VALUES
+("RU122","60k","su_john"),
+("RU123","25k","su_daenerys"),
+("RU124","44k","su_cersei"),
+("RU125","85k","su_tyrion");
+
+INSERT INTO employee_details_table
+VALUES
+("RU122","John","Snow",60),
+("RU123","Daenerys","Targaryen",88),
+("RU124","Cersei","Lannister",72),
+("RU125","Tyrion","Lannister",64);
+
+
+-- Queries
+
+SELECT employee_first_name FROM employee_details_table WHERE employee_id = ANY (SELECT employee_id FROM employee_salary_table WHERE employee_salary > '50k');
+SELECT employee_last_name FROM employee_details_table WHERE Graduation_percentile >70;
+SELECT employee_last_name FROM employee_details_table WHERE Graduation_percentile <70;
+-- SELECT employee_first_name, employee_last_name FROM employee_details_table WHERE employee_id = ANY (SELECT employee_id from)
+
+SELECT employee_first_name,employee_last_name FROM employee_details_table WHERE employee_id = ANY (SELECT employee_id FROM employee_salary_table where employee_code = ANY(SELECT employee_code FROM employee_code_table WHERE employee_domain <> "JAVA"));
+
+SELECT employee_id FROM employee_salary_table WHERE employee_code IS NULL;
+
+-- ---------------
+-- select employee_domain,employee_code from employee_code_table where employee_code in 
+-- (select employee_code from employee_salary_table);
+
+-- select employee_salary, employee_code from employee_salary_table where employee_code in(select employee_code,employee_domain from employee_code_table GROUP BY employee_domain) ;
+
+
+
+
+
+
+////////////////////////////////
+SELECT sum(employee_salary ),employee_domain
+FROM employee_salary_table
+CROSS JOIN employee_code_table
+WHERE employee_salary_table.employee_code = employee_code_table.employee_code
+GROUP BY employee_code_table.employee_domain;
+////////////////////////////
